@@ -1,0 +1,21 @@
+---
+
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: finding files created by test
+      find:
+        paths: /tmp/
+        age: 30d
+        owner: test
+        recurse: yes
+      register: files
+
+    - name: archiving the files
+      archive:
+        path: /tmp/
+        dest: /ansible/multi.zip
+      format: zip
+
+      
+      
