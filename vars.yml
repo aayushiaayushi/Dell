@@ -1,0 +1,4 @@
+---
+# vars file for dell
+source_file: /tmp/dell
+dest_file: /dell
