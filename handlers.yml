@@ -1,0 +1,48 @@
+---
+
+- hosts: localhost
+  gather_facts: yes
+  tasks:
+    - name: get service facts
+      service_facts:
+
+    - name: chcking db_service status
+      debug:
+         var:"{{ ansible_facts.services["db_service.service"].state}}" != "running"
+      notify:
+        - restarting service db_service
+        - restarting service app_service
+        - restarting service web_service
+    
+    - name: chcking app_service status
+      debug:
+         var:"{{ ansible_facts.services["app.service"].state}}" != "running"
+      notify:
+        - restarting service app_service
+        - restarting service web_service
+    
+
+    - name: chcking web_service status
+      debug:
+         var: "{{ansible_facts.services["web_service.service"].state}}"
+      notify:
+        - restarting service web_service
+
+  handlers:
+    - name: restarting service db_service
+      service:
+        name: "{{db_service}}"
+        state: started
+
+
+    
+    - name: restarting service app_service
+      service:
+        name: "{{app_service}}"
+        state: started
+
+
+    - name: restarting service web_service
+      service:
+        name: "{{web_service}}"
+        state: started
