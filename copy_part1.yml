@@ -1,0 +1,44 @@
+---
+# tasks file for dell
+
+   - name: copying file from remote to local
+     fetch:
+       src: "{{source_file}}"
+       dest: "{{dest_file}}"
+       flat: yes
+       remote_src: yes
+     delegate_to: ltdbreco6.example.com
+     register: copy
+   - debug: var=copy
+
+   - name: finding files in source dir
+     shell: |
+        find "{{source_file}}" -type f -mtime -30 -exec ls -l {} \; | grep -Ev '\.(log|out)$'
+     delegate_to: ltdbreco6.example.com
+     register: find_op
+   - debug: var=find_opi
+
+   - name: zipping files
+     archive:
+       path:
+         - "{{find_opi.stdout}}"
+       dest: /tmp/
+       format: zip
+     delegate_to: ltdbreco6.example.com
+     register: zipping
+   - debug: var=zipping
+   
+   - name: copying the zip file from remote to dest
+     fetch:
+       src: /tmp/
+       dest: "{{dest_file}}"
+       flat: yes
+       remote_src: yes
+     delegate_to: ltdbreco6.example.com
+     register: copy_zip
+   - debug: var=copy_zip
+
+   - name: cleaning zip file from remote
+     file: path="/tmp/*.zip" state=absent
+     delegate_to: ltdbreco6.example.com    
+        
